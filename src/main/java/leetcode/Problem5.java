@@ -5,43 +5,43 @@ import java.util.*;
 public class Problem5 {
 
     public static void main(String[] args) {
-        List<String> strings = new ArrayList<>();
-        Random random = new Random();
-        int count = 10000;
-        for (int i = 0; i < count; i++) {
-            int length = random.nextInt(1000);
-            StringBuilder sb = new StringBuilder(length);
-            for (int j = 0; j < length; j++) {
-                sb.append((char) (random.nextInt(26) + 97));
-            }
-            strings.add(sb.toString());
-        }
-
-        long start = System.currentTimeMillis();
+//        List<String> strings = new ArrayList<>();
+//        Random random = new Random();
+//        int count = 10;
+//        for (int i = 0; i < count; i++) {
+//            int length = random.nextInt(100000);
+//            StringBuilder sb = new StringBuilder(length);
+//            for (int j = 0; j < length; j++) {
+//                sb.append((char) (random.nextInt(26) + 97));
+//            }
+//            strings.add(sb.toString());
+//        }
+//
+//        long start = System.currentTimeMillis();
 //        Solution1 solution1 = new Solution1();
 //        for (int i = 0; i < count; i++) {
-//            if (i % 1000 == 0) {
+//            if (i % 1 == 0) {
 //                System.out.print(i + " ");
 //            }
 //            solution1.longestPalindrome(strings.get(i));
 //        }
-        Solution2 solution2 = new Solution2();
-        for (int i = 0; i < count; i++) {
-            solution2.longestPalindrome(strings.get(i));
-        }
-        System.out.println(System.currentTimeMillis() - start);
-        start = System.currentTimeMillis();
-
-
-        System.out.println(System.currentTimeMillis() - start);
+//        System.out.println(System.currentTimeMillis() - start);
+//        start = System.currentTimeMillis();
 //        Solution2 solution2 = new Solution2();
-//        System.out.println(solution2.longestPalindrome("abcdedcbbcdedcbxax"));
+//        for (int i = 0; i < count; i++) {
+//            solution2.longestPalindrome(strings.get(i));
+//        }
+//
+//
+//        System.out.println(System.currentTimeMillis() - start);
+        Solution2 solution2 = new Solution2();
+        System.out.println(solution2.longestPalindrome("abcdedcbbcdedcbxax"));
     }
 
     /*
-    * 2020-03-23
-    * cost = 256 ms 41.3 MB
-    * */
+     * 2020-03-23
+     * cost = 256 ms 41.3 MB
+     * */
     private static class Solution1 {
         private Object[] charIndices = new Object[128];
         private char[] chars;
@@ -107,7 +107,7 @@ public class Problem5 {
 
     /*
      * 2020-03-24
-     * cost = 63 ms 42.2 MB
+     * cost = 56 ms 41.8 MB
      * */
     private static class Solution2 {
 
@@ -116,65 +116,86 @@ public class Problem5 {
             int length = chars.length;
             if (length == 0) {
                 return "";
+            } else if (length == 1) {
+                return s;
             }
-            int start = 0;
+            int resultStart = 0;
             int resultLength = 1;
             List<EvenPalindrome> evenPalindromes = new LinkedList<>();
             List<OddPalindrome> oddPalindromes = new LinkedList<>();
 
+            char first = chars[0];
+            evenPalindromes.add(new EvenPalindrome(chars, first, 0));
+            oddPalindromes.add(new OddPalindrome(chars, first, 0));
 
-            for (int i = 0; i < length; i++) {
+            int evenMaxPossibleLength = 0;
+            int oddMaxPossibleLength = 0;
+            boolean skipEven = false;
+            boolean skipOdd = false;
+            for (int i = 1; i < length; i++) {
                 char c = chars[i];
+                int remain = 0;
+
                 Iterator<EvenPalindrome> evenIterator = evenPalindromes.iterator();
                 while (evenIterator.hasNext()) {
                     EvenPalindrome evenPalindrome = evenIterator.next();
+                    evenPalindrome.forward(c, i);
                     if (evenPalindrome.valid) {
-                        evenPalindrome.feed(c, i);
-                    } else {
-                        evenIterator.remove();
+                        remain++;
                         if (evenPalindrome.length() > resultLength) {
-                            start = evenPalindrome.start;
+                            resultStart = evenPalindrome.start;
                             resultLength = evenPalindrome.length();
                         }
-                    }
-                }
-                Iterator<OddPalindrome> oddIterator = oddPalindromes.iterator();
-                while (oddIterator.hasNext()) {
-                    OddPalindrome oddPalindrome = oddIterator.next();
-                    if (oddPalindrome.valid) {
-                        oddPalindrome.feed(c, i);
                     } else {
-                        oddIterator.remove();
-                        if (oddPalindrome.length() > resultLength) {
-                            start = oddPalindrome.start;
-                            resultLength = oddPalindrome.length();
-                        }
+                        evenIterator.remove();
                     }
                 }
 
-                if (i == length - 1) {
-                    evenIterator = evenPalindromes.iterator();
-                    while (evenIterator.hasNext()) {
-                        EvenPalindrome evenPalindrome = evenIterator.next();
-                        if (evenPalindrome.length() > resultLength) {
-                            start = evenPalindrome.start;
-                            resultLength = evenPalindrome.length();
-                        }
-                    }
-                    oddIterator = oddPalindromes.iterator();
-                    while (oddIterator.hasNext()) {
-                        OddPalindrome oddPalindrome = oddIterator.next();
+                Iterator<OddPalindrome> oddIterator = oddPalindromes.iterator();
+                while (oddIterator.hasNext()) {
+                    OddPalindrome oddPalindrome = oddIterator.next();
+                    oddPalindrome.forward(c, i);
+                    if (oddPalindrome.valid) {
+                        remain++;
                         if (oddPalindrome.length() > resultLength) {
-                            start = oddPalindrome.start;
+                            resultStart = oddPalindrome.start;
                             resultLength = oddPalindrome.length();
                         }
+                    } else {
+                        oddIterator.remove();
                     }
-                } else {
-                    evenPalindromes.add(new EvenPalindrome(chars, c, i));
-                    oddPalindromes.add(new OddPalindrome(chars, c, i));
+                }
+
+                if (!skipOdd) {
+                    int oddPossibleLength = OddPalindrome.possibleLength(i, length);
+                    if (oddPossibleLength > resultLength) {
+                        oddPalindromes.add(new OddPalindrome(chars, c, i));
+                    } else {
+                        if (oddPossibleLength < oddMaxPossibleLength) {
+                            skipOdd = true;
+                        } else {
+                            oddMaxPossibleLength = oddPossibleLength;
+                        }
+                    }
+                }
+                if (!skipEven) {
+                    int evenPossibleLength = EvenPalindrome.possibleLength(i, length);
+                    if (evenPossibleLength > resultLength) {
+                        evenPalindromes.add(new EvenPalindrome(chars, c, i));
+                    } else {
+                        if (evenPossibleLength < evenMaxPossibleLength) {
+                            skipEven = true;
+                        } else {
+                            evenMaxPossibleLength = evenPossibleLength;
+                        }
+                    }
+                }
+                if (remain == 0 && skipEven && skipOdd) {
+                    break;
                 }
             }
-            return String.valueOf(chars, start, resultLength);
+
+            return String.valueOf(chars, resultStart, resultLength);
         }
 
         private static class EvenPalindrome {
@@ -185,27 +206,34 @@ public class Problem5 {
                 this.toMatchIndex = index;
                 this.start = index;
                 this.end = index;
+                this.possibleLength = possibleLength(start, chars.length);
             }
 
-            private char[] chars;
+            private static int possibleLength(int start, int charLength) {
+                return charLength > 1 ? Math.min(charLength - start, start + 1) * 2 : 1;
+            }
+
+            private final char[] chars;
             private int start;
             private int end;
             private char toMatchChar;
             private int toMatchIndex;
-
+            private int possibleLength;
             private boolean valid = true;
 
-            private void feed(char c, int index) {
+            private void forward(char c, int index) {
                 if (toMatchChar == c) {
                     start = toMatchIndex;
                     end = index;
                     toMatchIndex = toMatchIndex - 1;
                     if (toMatchIndex >= 0) {
                         toMatchChar = chars[toMatchIndex];
-                        return;
+                    } else {
+                        toMatchChar = (char) -1;
                     }
+                } else {
+                    valid = false;
                 }
-                valid = false;
             }
 
             private int length() {
@@ -222,17 +250,22 @@ public class Problem5 {
                 this.toMatchIndex = index;
                 this.start = index;
                 this.end = index;
+                this.possibleLength = possibleLength(start, chars.length);
             }
 
-            private char[] chars;
+            private static int possibleLength(int start, int charLength) {
+                return charLength >= 3 ? Math.min(charLength - start - 2, start + 1) * 2 + 1 : 1;
+            }
+
+            private final char[] chars;
             private int start;
             private int end;
             private char toMatchChar;
             private int toMatchIndex;
-
+            private int possibleLength;
             private boolean valid = true;
 
-            private void feed(char c, int index) {
+            private void forward(char c, int index) {
                 if (index == start + 1) {
                     //ignore middle point
                     return;
@@ -243,10 +276,12 @@ public class Problem5 {
                     toMatchIndex = toMatchIndex - 1;
                     if (toMatchIndex >= 0) {
                         toMatchChar = chars[toMatchIndex];
-                        return;
+                    } else {
+                        toMatchChar = (char) -1;
                     }
+                } else {
+                    valid = false;
                 }
-                valid = false;
             }
 
             private int length() {
