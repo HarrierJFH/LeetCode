@@ -8,7 +8,7 @@ public class Problem1390 {
     private static final boolean[] isPrime;
 
     static {
-        isPrime = new boolean[100000];
+        isPrime = new boolean[50001];
         for (int prime : primes) {
             isPrime[prime] = true;
         }
@@ -35,7 +35,10 @@ public class Problem1390 {
         int result = 0;
         for (int num : nums) {
             for (int prime : primes) {
-                if (isPrime[num]) {
+                if (num < 50000 && isPrime[num]) {
+                    break;
+                }
+                if (prime * prime >= num) {
                     break;
                 }
                 if (num % prime == 0) {
