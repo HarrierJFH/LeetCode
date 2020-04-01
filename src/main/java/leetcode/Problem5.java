@@ -35,7 +35,7 @@ public class Problem5 {
 //
 //        System.out.println(System.currentTimeMillis() - start);
         Solution2 solution2 = new Solution2();
-        System.out.println(solution2.longestPalindrome("abcdedcbbcdedcbxax"));
+        System.out.println(solution2.longestPalindrome("babad"));
     }
 
     /*
@@ -108,6 +108,9 @@ public class Problem5 {
     /*
      * 2020-03-24
      * cost = 56 ms 41.8 MB
+     *
+     * 2020-04-01
+     * cost = 23 ms 40.5 MB
      * */
     private static class Solution2 {
 
@@ -121,12 +124,9 @@ public class Problem5 {
             }
             int resultStart = 0;
             int resultLength = 1;
-            List<EvenPalindrome> evenPalindromes = new LinkedList<>();
-            List<OddPalindrome> oddPalindromes = new LinkedList<>();
-
             char first = chars[0];
-            evenPalindromes.add(new EvenPalindrome(chars, first, 0));
-            oddPalindromes.add(new OddPalindrome(chars, first, 0));
+            EvenPalindrome lastEvenPalindrome = new EvenPalindrome(chars, first, 0, null, null);
+            OddPalindrome lastOddPalindrome = new OddPalindrome(chars, first, 0, null, null);
 
             int evenMaxPossibleLength = 0;
             int oddMaxPossibleLength = 0;
@@ -134,42 +134,68 @@ public class Problem5 {
             boolean skipOdd = false;
             for (int i = 1; i < length; i++) {
                 char c = chars[i];
-                int remain = 0;
 
-                Iterator<EvenPalindrome> evenIterator = evenPalindromes.iterator();
-                while (evenIterator.hasNext()) {
-                    EvenPalindrome evenPalindrome = evenIterator.next();
-                    evenPalindrome.forward(c, i);
-                    if (evenPalindrome.valid) {
-                        remain++;
-                        if (evenPalindrome.length() > resultLength) {
-                            resultStart = evenPalindrome.start;
-                            resultLength = evenPalindrome.length();
+                if (lastEvenPalindrome != null) {
+                    EvenPalindrome evenPalindrome = lastEvenPalindrome;
+                    while (evenPalindrome != null) {
+                        evenPalindrome.forward(c, i);
+                        if (evenPalindrome.valid) {
+                            if (evenPalindrome.length() > resultLength) {
+                                resultStart = evenPalindrome.start;
+                                resultLength = evenPalindrome.length();
+                            }
+                        } else {
+                            if (evenPalindrome == lastEvenPalindrome) {
+                                lastEvenPalindrome = evenPalindrome.previous;
+                                if (lastEvenPalindrome != null) {
+                                    lastEvenPalindrome.next = null;
+                                }
+                            } else {
+                                evenPalindrome.next.previous = evenPalindrome.previous;
+                                if (evenPalindrome.previous != null) {
+                                    evenPalindrome.previous.next = evenPalindrome.next;
+                                }
+                            }
                         }
-                    } else {
-                        evenIterator.remove();
+                        evenPalindrome = evenPalindrome.previous;
                     }
                 }
 
-                Iterator<OddPalindrome> oddIterator = oddPalindromes.iterator();
-                while (oddIterator.hasNext()) {
-                    OddPalindrome oddPalindrome = oddIterator.next();
-                    oddPalindrome.forward(c, i);
-                    if (oddPalindrome.valid) {
-                        remain++;
-                        if (oddPalindrome.length() > resultLength) {
-                            resultStart = oddPalindrome.start;
-                            resultLength = oddPalindrome.length();
+                if (lastOddPalindrome != null) {
+                    OddPalindrome oddPalindrome = lastOddPalindrome;
+                    while (oddPalindrome != null) {
+                        oddPalindrome.forward(c, i);
+                        if (oddPalindrome.valid) {
+                            if (oddPalindrome.length() > resultLength) {
+                                resultStart = oddPalindrome.start;
+                                resultLength = oddPalindrome.length();
+                            }
+                        } else {
+                            if (oddPalindrome == lastOddPalindrome) {
+                                lastOddPalindrome = oddPalindrome.previous;
+                                if (lastOddPalindrome != null) {
+                                    lastOddPalindrome.next = null;
+                                }
+                            } else {
+                                oddPalindrome.next.previous = oddPalindrome.previous;
+                                if (oddPalindrome.previous != null) {
+                                    oddPalindrome.previous.next = oddPalindrome.next;
+                                }
+                            }
                         }
-                    } else {
-                        oddIterator.remove();
+                        oddPalindrome = oddPalindrome.previous;
                     }
                 }
 
                 if (!skipOdd) {
                     int oddPossibleLength = OddPalindrome.possibleLength(i, length);
                     if (oddPossibleLength > resultLength) {
-                        oddPalindromes.add(new OddPalindrome(chars, c, i));
+                        if (lastOddPalindrome != null) {
+                            lastOddPalindrome = new OddPalindrome(chars, c, i, lastOddPalindrome, null);
+                            lastOddPalindrome.previous.next = lastOddPalindrome;
+                        } else {
+                            lastOddPalindrome = new OddPalindrome(chars, c, i, lastOddPalindrome, null);
+                        }
                     } else {
                         if (oddPossibleLength < oddMaxPossibleLength) {
                             skipOdd = true;
@@ -181,7 +207,12 @@ public class Problem5 {
                 if (!skipEven) {
                     int evenPossibleLength = EvenPalindrome.possibleLength(i, length);
                     if (evenPossibleLength > resultLength) {
-                        evenPalindromes.add(new EvenPalindrome(chars, c, i));
+                        if (lastEvenPalindrome != null) {
+                            lastEvenPalindrome = new EvenPalindrome(chars, c, i, lastEvenPalindrome, null);
+                            lastEvenPalindrome.previous.next = lastEvenPalindrome;
+                        } else {
+                            lastEvenPalindrome = new EvenPalindrome(chars, c, i, lastEvenPalindrome, null);
+                        }
                     } else {
                         if (evenPossibleLength < evenMaxPossibleLength) {
                             skipEven = true;
@@ -190,7 +221,7 @@ public class Problem5 {
                         }
                     }
                 }
-                if (remain == 0 && skipEven && skipOdd) {
+                if (lastEvenPalindrome == null && lastOddPalindrome == null && skipEven && skipOdd) {
                     break;
                 }
             }
@@ -200,13 +231,15 @@ public class Problem5 {
 
         private static class EvenPalindrome {
 
-            private EvenPalindrome(char[] chars, char c, int index) {
+            private EvenPalindrome(char[] chars, char c, int index, EvenPalindrome previous, EvenPalindrome next) {
                 this.chars = chars;
                 this.toMatchChar = c;
                 this.toMatchIndex = index;
                 this.start = index;
                 this.end = index;
                 this.possibleLength = possibleLength(start, chars.length);
+                this.previous = previous;
+                this.next = next;
             }
 
             private static int possibleLength(int start, int charLength) {
@@ -220,8 +253,13 @@ public class Problem5 {
             private int toMatchIndex;
             private int possibleLength;
             private boolean valid = true;
+            private EvenPalindrome previous;
+            private EvenPalindrome next;
 
             private void forward(char c, int index) {
+                if (!valid) {
+                    throw new RuntimeException();
+                }
                 if (toMatchChar == c) {
                     start = toMatchIndex;
                     end = index;
@@ -244,13 +282,15 @@ public class Problem5 {
 
         private static class OddPalindrome {
 
-            private OddPalindrome(char[] chars, char c, int index) {
+            private OddPalindrome(char[] chars, char c, int index, OddPalindrome previous, OddPalindrome next) {
                 this.chars = chars;
                 this.toMatchChar = c;
                 this.toMatchIndex = index;
                 this.start = index;
                 this.end = index;
                 this.possibleLength = possibleLength(start, chars.length);
+                this.previous = previous;
+                this.next = next;
             }
 
             private static int possibleLength(int start, int charLength) {
@@ -264,8 +304,13 @@ public class Problem5 {
             private int toMatchIndex;
             private int possibleLength;
             private boolean valid = true;
+            private OddPalindrome previous;
+            private OddPalindrome next;
 
             private void forward(char c, int index) {
+                if (!valid) {
+                    throw new RuntimeException();
+                }
                 if (index == start + 1) {
                     //ignore middle point
                     return;
