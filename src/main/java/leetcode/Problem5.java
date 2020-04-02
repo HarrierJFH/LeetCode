@@ -1,6 +1,7 @@
 package leetcode;
 
-import java.util.*;
+import java.util.LinkedList;
+import java.util.List;
 
 public class Problem5 {
 
@@ -34,9 +35,10 @@ public class Problem5 {
 //
 //
 //        System.out.println(System.currentTimeMillis() - start);
-        Solution2 solution2 = new Solution2();
+
+//        Solution2 solution2 = new Solution2();
 //        System.out.println(solution2.longestPalindrome("abcdedcbbcdedcbee"));
-        System.out.println(solution2.longestPalindrome("babad"));
+//        System.out.println(solution2.longestPalindrome("babad"));
     }
 
     /*
@@ -112,6 +114,9 @@ public class Problem5 {
      *
      * 2020-04-01
      * cost = 22 ms 39.5 MB
+     *
+     * 2020-04-02
+     * cost = 20 ms 39.9 MB
      * */
     private static class Solution2 {
 
@@ -129,8 +134,7 @@ public class Problem5 {
             EvenPalindrome lastEvenPalindrome = new EvenPalindrome(chars, first, 0, null);
             OddPalindrome lastOddPalindrome = new OddPalindrome(chars, first, 0, null);
 
-            int evenMaxPossibleLength = 0;
-            int oddMaxPossibleLength = 0;
+            int peak = length / 2 - 1;
             boolean skipEven = false;
             boolean skipOdd = false;
             for (int i = 1; i < length; i++) {
@@ -140,20 +144,23 @@ public class Problem5 {
                     EvenPalindrome evenPalindrome = lastEvenPalindrome;
                     EvenPalindrome next = null;
                     while (evenPalindrome != null) {
-                        evenPalindrome.forward(c, i);
-                        if (evenPalindrome.valid) {
-                            if (evenPalindrome.length() > resultLength) {
-                                resultStart = evenPalindrome.start;
-                                resultLength = evenPalindrome.length();
-                            }
-                        } else {
-                            if (evenPalindrome == lastEvenPalindrome) {
-                                lastEvenPalindrome = evenPalindrome.previous;
-                            } else {
-                                next.previous = evenPalindrome.previous;
+                        if (evenPalindrome.possibleLength > resultLength) {
+                            evenPalindrome.forward(c, i);
+                            if (evenPalindrome.valid) {
+                                if (evenPalindrome.length() > resultLength) {
+                                    resultStart = evenPalindrome.start;
+                                    resultLength = evenPalindrome.length();
+                                }
+                                next = evenPalindrome;
+                                evenPalindrome = evenPalindrome.previous;
+                                continue;
                             }
                         }
-                        next = evenPalindrome;
+                        if (evenPalindrome == lastEvenPalindrome) {
+                            lastEvenPalindrome = evenPalindrome.previous;
+                        } else {
+                            next.previous = evenPalindrome.previous;
+                        }
                         evenPalindrome = evenPalindrome.previous;
                     }
                 }
@@ -162,47 +169,44 @@ public class Problem5 {
                     OddPalindrome oddPalindrome = lastOddPalindrome;
                     OddPalindrome next = null;
                     while (oddPalindrome != null) {
-                        oddPalindrome.forward(c, i);
-                        if (oddPalindrome.valid) {
-                            if (oddPalindrome.length() > resultLength) {
-                                resultStart = oddPalindrome.start;
-                                resultLength = oddPalindrome.length();
-                            }
-                        } else {
-                            if (oddPalindrome == lastOddPalindrome) {
-                                lastOddPalindrome = oddPalindrome.previous;
-                            } else {
-                                next.previous = oddPalindrome.previous;
+                        if (oddPalindrome.possibleLength > resultLength) {
+                            oddPalindrome.forward(c, i);
+                            if (oddPalindrome.valid) {
+                                if (oddPalindrome.length() > resultLength) {
+                                    resultStart = oddPalindrome.start;
+                                    resultLength = oddPalindrome.length();
+                                }
+                                next = oddPalindrome;
+                                oddPalindrome = oddPalindrome.previous;
+                                continue;
                             }
                         }
-                        next = oddPalindrome;
+                        if (oddPalindrome == lastOddPalindrome) {
+                            lastOddPalindrome = oddPalindrome.previous;
+                        } else {
+                            next.previous = oddPalindrome.previous;
+                        }
                         oddPalindrome = oddPalindrome.previous;
                     }
                 }
 
                 if (!skipEven) {
-                    int evenPossibleLength = EvenPalindrome.possibleLength(i, length);
+                    EvenPalindrome evenPalindrome = new EvenPalindrome(chars, c, i, lastEvenPalindrome);
+                    int evenPossibleLength = evenPalindrome.possibleLength;
                     if (evenPossibleLength > resultLength) {
-                        lastEvenPalindrome = new EvenPalindrome(chars, c, i, lastEvenPalindrome);
+                        lastEvenPalindrome = evenPalindrome;
                     } else {
-                        if (evenPossibleLength < evenMaxPossibleLength) {
-                            skipEven = true;
-                        } else {
-                            evenMaxPossibleLength = evenPossibleLength;
-                        }
+                        skipEven = i >= peak;
                     }
                 }
 
                 if (!skipOdd) {
-                    int oddPossibleLength = OddPalindrome.possibleLength(i, length);
+                    OddPalindrome oddPalindrome = new OddPalindrome(chars, c, i, lastOddPalindrome);
+                    int oddPossibleLength = oddPalindrome.possibleLength;
                     if (oddPossibleLength > resultLength) {
-                        lastOddPalindrome = new OddPalindrome(chars, c, i, lastOddPalindrome);
+                        lastOddPalindrome = oddPalindrome;
                     } else {
-                        if (oddPossibleLength < oddMaxPossibleLength) {
-                            skipOdd = true;
-                        } else {
-                            oddMaxPossibleLength = oddPossibleLength;
-                        }
+                        skipOdd = i >= peak;
                     }
                 }
 
@@ -226,7 +230,7 @@ public class Problem5 {
                 this.previous = previous;
             }
 
-            private static int possibleLength(int start, int charLength) {
+            private int possibleLength(int start, int charLength) {
                 return charLength > 1 ? Math.min(charLength - start, start + 1) * 2 : 1;
             }
 
@@ -272,7 +276,7 @@ public class Problem5 {
                 this.previous = previous;
             }
 
-            private static int possibleLength(int start, int charLength) {
+            private int possibleLength(int start, int charLength) {
                 return charLength >= 3 ? Math.min(charLength - start - 2, start + 1) * 2 + 1 : 1;
             }
 
