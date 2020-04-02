@@ -14,30 +14,13 @@ public class Problem1390 {
         }
     }
 
-    public boolean isPrime(int num) {
-        if (num <= 1) {
-            return false;
-        } else if (num == 2) {
-            return true;
-        }
-        for (int i = 2; ; i++) {
-            if (num % i == 0) {
-                return false;
-            }
-            if (i * i > num) {
-                break;
-            }
-        }
-        return true;
-    }
-
     public int sumFourDivisors(int[] nums) {
         int result = 0;
         for (int num : nums) {
+            if (num < 50000 && isPrime[num]) {
+                continue;
+            }
             for (int prime : primes) {
-                if (num < 50000 && isPrime[num]) {
-                    break;
-                }
                 if (prime * prime >= num) {
                     break;
                 }
@@ -57,15 +40,8 @@ public class Problem1390 {
 
     public static void main(String[] args) {
         Problem1390 problem1390 = new Problem1390();
-//        List<Integer> list = new ArrayList<>();
-//        for (int i = 2; i < 50000; i++) {
-//            if (problem1390.isPrime(i)) {
-//                list.add(i);
-//            }
-//        }
-//        System.out.println(list.size());
 
-        int times = 10000;
+        int times = 1000000;
         int[] nums = new int[times];
         Random random = new Random();
         for (int i = 0; i < times; i++) {
@@ -74,6 +50,22 @@ public class Problem1390 {
         long t = System.currentTimeMillis();
         System.out.println(problem1390.sumFourDivisors(nums));
         System.out.println(System.currentTimeMillis() - t);
+    }public boolean isPrime(int num) {
+        if (num <= 1) {
+            return false;
+        } else if (num == 2) {
+            return true;
+        }
+        for (int i = 0; ; i++) {
+            int prime = primes[i];
+            if (num % prime == 0) {
+                return false;
+            }
+            if (prime * prime > num) {
+                break;
+            }
+        }
+        return true;
     }
 
 }
