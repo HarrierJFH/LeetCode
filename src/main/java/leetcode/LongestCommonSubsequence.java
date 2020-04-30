@@ -1,47 +1,36 @@
 package leetcode;
 
-import util.UtilsKt;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
+import java.util.Arrays;
 
 public class LongestCommonSubsequence {
 
     public int longestCommonSubsequence(String text1, String text2) {
-        String s, l;
-        if (text1.length() < text2.length()) {
-            s = text1;
-            l = text2;
-        } else {
-            l = text1;
-            s = text2;
+        String[] strings = biFilter(text1, text2);
+        text1 = strings[0];
+        text2 = strings[1];
+        if (text1.isEmpty() || text2.isEmpty()) {
+            return 0;
         }
-
-        int i;
-        int c;
-        int[] index = new int[26];
-        for (i = 0; i < s.length(); i++) {
-            index[s.charAt(i) - 97] = i;
-        }
-
-        List<Integer>[] lists = new List[26];
-        for (i = 0; i < l.length(); i++) {
-            c = l.charAt(i) - 97;
-            if (index[c] > 0) {
-                if (lists[c] == null) {
-                    lists[c] = new ArrayList<>();
+        int[] longest = new int[text1.length()];
+        int lastBefore, lastAfter, current, t;
+        char c;
+        for (int i = text2.length() - 1; i >= 0; i--) {
+            c = text2.charAt(i);
+            lastBefore = 0;
+            lastAfter = 0;
+            for (int j = text1.length() - 1; j >= 0; j--) {
+                t = longest[j];
+                current = Math.max(t, lastAfter);
+                if (text1.charAt(j) == c) {
+                    current = Math.max(1 + lastBefore, current);
                 }
-                lists[c].add(i);
+                lastBefore = t;
+                lastAfter = current;
+                longest[j] = current;
             }
+            System.out.println(Arrays.toString(longest));
         }
-
-        for (i = 0; i < 26; i++) {
-            index[i] = 0;
-        }
-
-
-        return 0;
+        return longest[0];
     }
 
     private String[] biFilter(String text1, String text2) {
@@ -98,9 +87,12 @@ public class LongestCommonSubsequence {
         LongestCommonSubsequence problem = new LongestCommonSubsequence();
 //        String l = "fmtclsfaxchgjavqrifqbkzspazw";
 //        String s = "nczivetoxqjclwbwtibqvelwxsdaz";
+        String l = "cdebbadeacd";
+        String s = "acadebb";
+        System.out.println(problem.longestCommonSubsequence(l, s));
 
-        String l = "sxylbpqxfckwxiydioeyttamexpmhgzvxkhrhkkakcraqchmefcridcdivjquvjclnebcb";
-        String s = "yocbauqdqvdvfvgllblqcgcmzzzkyoevteyyiguxmpupxzosu";
+//        String l = "sxylbpqxfckwxiydioeyttamexpmhgzvxkhrhkkakcraqchmefcridcdivjquvjclnebcb";
+//        String s = "yocbauqdqvdvfvgllblqcgcmzzzkyoevteyyiguxmpupxzosu";
 //        System.out.println(problem.longest("mhunuzqrkzsnidwbun", 0, "szulspmhwpazoxijwbq", 0));
 //        System.out.println(problem.longest("hofubmnylkra", 0, "pqhgxgdofcvmr", 0));
 //        System.out.println(problem.longest("fmtclsfaxchgjavqrifqbkzspazw", 0, "nczivetoxqjclwbwtibqvelwxsdaz", 0));
@@ -117,12 +109,12 @@ public class LongestCommonSubsequence {
 //        System.out.println(sb);
 
 
-        String[] strings = problem.biFilter(l, s);
-        System.out.println(l + "->" + strings[0]);
-        System.out.println(s + "->" + strings[1]);
+//        String[] strings = problem.biFilter(l, s);
+//        System.out.println(l + "->" + strings[0]);
+//        System.out.println(s + "->" + strings[1]);
 //        System.out.println(UtilsKt.timeCost(() -> problem.longest(l, 0, s, 0), 1));
 //        System.out.println(UtilsKt.timeCost(() -> problem.longest(strings[0], 0, strings[1], 0), 1));
-        UtilsKt.timeCostCompare(() -> problem.longest(l, 0, s, 0), () -> problem.longest(strings[0], 0, strings[1], 0), 1);
+//        UtilsKt.timeCostCompare(() -> problem.longest(l, 0, s, 0), () -> problem.longest(strings[0], 0, strings[1], 0), 1);
 //        System.out.println(problem.longest(strings[0], 0, strings[1], 0));
     }
 
