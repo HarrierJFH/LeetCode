@@ -2,7 +2,7 @@ package leetcode;
 
 import java.util.Arrays;
 
-public class LongestCommonSubsequence {
+public class Problem1143 {
 
     public int longestCommonSubsequence(String text1, String text2) {
         String[] strings = biFilter(text1, text2);
@@ -84,7 +84,7 @@ public class LongestCommonSubsequence {
     }
 
     public static void main(String[] args) {
-        LongestCommonSubsequence problem = new LongestCommonSubsequence();
+        Problem1143 problem = new Problem1143();
 //        String l = "fmtclsfaxchgjavqrifqbkzspazw";
 //        String s = "nczivetoxqjclwbwtibqvelwxsdaz";
         String l = "cdebbadeacd";
