@@ -1,12 +1,12 @@
 package leetcode;
 
-public class Problem476 {
+public class Problem1009 {
 
-    public int findComplement(int num) {
+    public int bitwiseComplement(int N) {
         for (int i = 0x40000000; i > 0; i = i >> 1) {
-            if ((num & i) == i) {
+            if ((N & i) == i) {
                 i = (i << 1) - 1;
-                return i - num;
+                return i - N;
             }
         }
         return 1;
