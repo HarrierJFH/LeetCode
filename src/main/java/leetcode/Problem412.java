@@ -5,7 +5,7 @@ import util.UtilsKt;
 import java.util.ArrayList;
 import java.util.List;
 
-public class FizzBuzz {
+public class Problem412 {
 
     public List<String> fizzBuzz(int n) {
         List<String> result = new ArrayList<>(n);
@@ -49,10 +49,10 @@ public class FizzBuzz {
     }
 
     public static void main(String[] args) {
-        FizzBuzz fizzBuzz = new FizzBuzz();
+        Problem412 problem412 = new Problem412();
         int n = 10000000;
-        UtilsKt.timeCostCompare(() -> fizzBuzz.fizzBuzz2(n), () -> fizzBuzz.fizzBuzz(n), 1);
-        UtilsKt.timeCostCompare(() -> fizzBuzz.fizzBuzz(n), () -> fizzBuzz.fizzBuzz2(n), 1);
+        UtilsKt.timeCostCompare(() -> problem412.fizzBuzz2(n), () -> problem412.fizzBuzz(n), 1);
+        UtilsKt.timeCostCompare(() -> problem412.fizzBuzz(n), () -> problem412.fizzBuzz2(n), 1);
     }
 
 }
