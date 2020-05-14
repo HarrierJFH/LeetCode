@@ -19,21 +19,19 @@ public class Problem208 {
          * Inserts a word into the trie.
          */
         public void insert(String word) {
-            char[] chars = word.toCharArray();
-            int start = 0, end = word.length(), i;
+            int i = 0, end = word.length() - 1, v;
             Trie trie, cur = this;
             for (; ; ) {
-                i = chars[start] - 97;
-                trie = cur.tries[i];
+                v = word.charAt(i) - 97;
+                trie = cur.tries[v];
                 if (trie == null) {
                     trie = new Trie();
-                    cur.tries[i] = trie;
+                    cur.tries[v] = trie;
                 }
-                if (end - start == 1) {
+                if (i++ == end) {
                     trie.end = true;
                     break;
                 } else {
-                    start++;
                     cur = trie;
                 }
             }
@@ -43,16 +41,14 @@ public class Problem208 {
          * Returns if the word is in the trie.
          */
         public boolean search(String word) {
-            char[] chars = word.toCharArray();
-            int start = 0, end = word.length();
+            int i = 0, end = word.length() - 1;
             Trie trie, cur = this;
             for (; ; ) {
-                trie = cur.tries[chars[start] - 97];
+                trie = cur.tries[word.charAt(i) - 97];
                 if (trie != null) {
-                    if (end - start == 1) {
+                    if (i++ == end) {
                         return trie.end;
                     } else {
-                        ++start;
                         cur = trie;
                     }
                 } else {
@@ -65,16 +61,14 @@ public class Problem208 {
          * Returns if there is any word in the trie that starts with the given prefix.
          */
         public boolean startsWith(String prefix) {
-            char[] chars = prefix.toCharArray();
-            int start = 0, end = prefix.length();
-            Trie trie, cur = this;;
+            int i = 0, end = prefix.length() - 1;
+            Trie trie, cur = this;
             for (; ; ) {
-                trie = cur.tries[chars[start] - 97];
+                trie = cur.tries[prefix.charAt(i) - 97];
                 if (trie != null) {
-                    if (end - start == 1) {
+                    if (i++ == end) {
                         return true;
                     } else {
-                        ++start;
                         cur = trie;
                     }
                 } else {
