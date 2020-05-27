@@ -7,7 +7,7 @@ public class Problem886 {
         if (i-- == 0) {
             return true;
         }
-        int[] g = new int[2001];
+        int[] g = new int[N + 1];
         g[dislikes[i][0]] = 1;
         g[dislikes[i--][1]] = 2;
         for (; i > -1; i--) {
