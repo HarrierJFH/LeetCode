@@ -3,32 +3,30 @@ package leetcode;
 public class Problem886 {
 
     public boolean possibleBipartition(int N, int[][] dislikes) {
-        int l = dislikes.length;
-        if (l == 0) {
+        int i = dislikes.length;
+        if (i-- == 0) {
             return true;
         }
-        int i = l - 1;
-        boolean[] g1 = new boolean[2001];
-        boolean[] g2 = new boolean[2001];
-        g1[dislikes[i][0]] = true;
-        g2[dislikes[i][1]] = true;
-        for (i = l - 2; i > -1; i--) {
-            if (g1[dislikes[i][1]]) {
-                if (g1[dislikes[i][0]]) {
+        int[] g = new int[2001];
+        g[dislikes[i][0]] = 1;
+        g[dislikes[i--][1]] = 2;
+        for (; i > -1; i--) {
+            if (g[dislikes[i][1]] == 1) {
+                if (g[dislikes[i][0]] == 1) {
                     return false;
                 } else {
-                    g2[dislikes[i][0]] = true;
+                    g[dislikes[i][0]] = 2;
                 }
-            } else if (g2[dislikes[i][1]]) {
-                if (g2[dislikes[i][0]]) {
+            } else if (g[dislikes[i][1]] == 2) {
+                if (g[dislikes[i][0]] == 2) {
                     return false;
                 } else {
-                    g1[dislikes[i][0]] = true;
+                    g[dislikes[i][0]] = 1;
                 }
-            } else if (g1[dislikes[i][0]]) {
-                g2[dislikes[i][1]] = true;
-            } else if (g2[dislikes[i][0]]) {
-                g1[dislikes[i][1]] = true;
+            } else if (g[dislikes[i][0]] == 1) {
+                g[dislikes[i][1]] = 2;
+            } else if (g[dislikes[i][0]] == 2) {
+                g[dislikes[i][1]] = 1;
             }
         }
         return true;
