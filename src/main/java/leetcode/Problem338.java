@@ -6,7 +6,6 @@ public class Problem338 {
 
     public int[] countBits(int num) {
         int[] array = new int[num + 1];
-        array[0] = 0;
         int i = 1, l = 1, j = 0;
         while (i <= num) {
             if ((array[i++] = array[j++] + 1) == l) {
