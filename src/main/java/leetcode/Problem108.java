@@ -14,11 +14,10 @@ public class Problem108 {
         }
         int m = length / 2;
         TreeNode root = new TreeNode(nums[m + offset]);
-        if (length == 1) {
-            return root;
+        if (length >= 1) {
+            root.left = sortedArrayToBST(nums, offset, m);
+            root.right = sortedArrayToBST(nums, m + offset + 1, length % 2 == 1 ? m : m - 1);
         }
-        root.left = sortedArrayToBST(nums, offset, m);
-        root.right = sortedArrayToBST(nums, m + offset + 1, length % 2 == 1 ? m : m - 1);
         return root;
     }
 
